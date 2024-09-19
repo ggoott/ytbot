@@ -31,7 +31,7 @@ def download_video(message):
             filename = f"{title}.webm"
 
             # Сжимаем видео перед отправкой
-            compressed_filename = f"compressed_{filename}"
+            compressed_filename = f"{filename}"
             os.system(f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\"")
 
             # Отправка видео пользователю
