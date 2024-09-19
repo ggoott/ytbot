@@ -20,7 +20,7 @@ def download_video(message):
         'outtmpl': '%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'webm',
+            'preferedformat': 'mpeg',
         }],
     }
 
@@ -28,12 +28,18 @@ def download_video(message):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             title = info['title']
-            filename = f"{title}.webm"
+            filename = f"{title}.mpeg"
+            print(f"Скачиваемое имя файла: {filename}")
 
             # Сжимаем видео перед отправкой
-            compressed_filename = f"{filename}"
-            os.system(f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\"")
+            compressed_filename = f"compressed_{filename}"
+            ffmpeg_command = f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\""
+            print(f"Выполняем команду: {ffmpeg_command}")
 
+            if os.system(ffmpeg_command) != 0:
+                raise Exception("Ошибка при сжатии видео")
+
+            print(f"Отправляем видео: {compressed_filename}")
             # Отправка видео пользователю
             with open(compressed_filename, 'rb') as video:
                 bot.send_video(message.chat.id, video, caption=f"Загрузка завершена: {title}")
@@ -43,6 +49,7 @@ def download_video(message):
             os.remove(compressed_filename)
     except Exception as e:
         bot.reply_to(message, f"Произошла ошибка: {str(e)}")
+        print(f"Ошибка: {str(e)}")
 
 if __name__ == '__main__':
     bot.polling()
