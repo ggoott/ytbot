@@ -1,6 +1,7 @@
 import telebot
 import yt_dlp
 import os
+import subprocess
 
 API_TOKEN = '6892245900:AAE1nZJ4LmY4mB7KiU-5qePNXhSWGXl3t5M'
 bot = telebot.TeleBot(API_TOKEN)
@@ -18,10 +19,6 @@ def download_video(message):
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'outtmpl': '%(title)s.%(ext)s',
-        'postprocessors': [{
-            'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'webm',
-        }],
     }
 
     try:
@@ -31,24 +28,12 @@ def download_video(message):
             filename = f"{title}.webm"
             print(f"Скачиваемое имя файла: {filename}")
 
-            # Сжимаем видео перед отправкой
-            compressed_filename = f"compressed_{filename}"
-            ffmpeg_command = f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\""
-            print(f"Выполняем команду: {ffmpeg_command}")
-
-            try:
-                result = subprocess.run(ffmpeg_command, shell=True, check=True, capture_output=True, text=True)
-                print(result.stdout)  # Вывод команды
-            except subprocess.CalledProcessError as e:
-                print(f"Ошибка при сжатии видео: {e.stderr}")  # Вывод ошибки
-                raise Exception("Ошибка при сжатии видео")
             # Отправка видео пользователю
-            with open(compressed_filename, 'rb') as video:
+            with open(filename, 'rb') as video:
                 bot.send_video(message.chat.id, video, caption=f"Загрузка завершена: {title}")
 
             # Удаление видео после отправки
             os.remove(filename)
-            os.remove(compressed_filename)
     except Exception as e:
         bot.reply_to(message, f"Произошла ошибка: {str(e)}")
         print(f"Ошибка: {str(e)}")
