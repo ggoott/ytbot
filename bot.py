@@ -20,7 +20,7 @@ def download_video(message):
         'outtmpl': '%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'mp4',
+            'preferedformat': 'webm',
         }],
     }
 
@@ -28,7 +28,7 @@ def download_video(message):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             title = info['title']
-            filename = f"{title}.mp4"
+            filename = f"{title}.webm"
 
             # Сжимаем видео перед отправкой
             compressed_filename = f"compressed_{filename}"
