@@ -1,4 +1,3 @@
-
 import telebot
 import yt_dlp
 import os
@@ -21,7 +20,7 @@ def download_video(message):
         'outtmpl': '%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'mp4',  # Исправлено с 'preferredformat' на 'preferedformat'
+            'preferedformat': 'mp4',
         }],
     }
 
@@ -33,7 +32,7 @@ def download_video(message):
 
             # Сжимаем видео перед отправкой
             compressed_filename = f"compressed_{filename}"
-            os.system(f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 \"{compressed_filename}\"")
+            os.system(f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\"")
 
             # Отправка видео пользователю
             with open(compressed_filename, 'rb') as video:
@@ -45,5 +44,5 @@ def download_video(message):
     except Exception as e:
         bot.reply_to(message, f"Произошла ошибка: {str(e)}")
 
-if __name__ == '__main__':  # Исправлено с 'name' на '__name__'
-    bot.polling() 
+if __name__ == '__main__':
+    bot.polling()
