@@ -1,3 +1,4 @@
+
 import telebot
 import yt_dlp
 import os
@@ -20,7 +21,7 @@ def download_video(message):
         'outtmpl': '%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'mp4',
+            'preferredformat': 'mp4',
         }],
     }
 
@@ -30,12 +31,17 @@ def download_video(message):
             title = info['title']
             filename = f"{title}.mp4"
 
+            # Сжимаем видео перед отправкой
+            compressed_filename = f"compressed_{filename}"
+            os.system(f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 \"{compressed_filename}\"")
+
             # Отправка видео пользователю
-            with open(filename, 'rb') as video:
+            with open(compressed_filename, 'rb') as video:
                 bot.send_video(message.chat.id, video, caption=f"Загрузка завершена: {title}")
 
             # Удаление видео после отправки
             os.remove(filename)
+            os.remove(compressed_filename)
     except Exception as e:
         bot.reply_to(message, f"Произошла ошибка: {str(e)}")
 
