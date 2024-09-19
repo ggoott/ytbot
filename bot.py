@@ -17,11 +17,11 @@ def download_video(message):
 
     # Параметры загрузки
     ydl_opts = {
-        'format': 'best',
+        'format': 'bestvideo+bestaudio/best',
         'outtmpl': '%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegVideoConvertor',
-            'preferredformat': 'mp4',
+            'preferedformat': 'mp4',  # Исправлено с 'preferredformat' на 'preferedformat'
         }],
     }
 
@@ -45,5 +45,5 @@ def download_video(message):
     except Exception as e:
         bot.reply_to(message, f"Произошла ошибка: {str(e)}")
 
-if __name__ == '__main__':
-    bot.polling()
+if __name__ == '__main__':  # Исправлено с 'name' на '__name__'
+    bot.polling() 
