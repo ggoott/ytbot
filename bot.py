@@ -36,10 +36,12 @@ def download_video(message):
             ffmpeg_command = f"ffmpeg -i \"{filename}\" -vcodec libx264 -crf 28 -preset ultrafast \"{compressed_filename}\""
             print(f"Выполняем команду: {ffmpeg_command}")
 
-            if os.system(ffmpeg_command) != 0:
+            try:
+                result = subprocess.run(ffmpeg_command, shell=True, check=True, capture_output=True, text=True)
+                print(result.stdout)  # Вывод команды
+            except subprocess.CalledProcessError as e:
+                print(f"Ошибка при сжатии видео: {e.stderr}")  # Вывод ошибки
                 raise Exception("Ошибка при сжатии видео")
-
-            print(f"Отправляем видео: {compressed_filename}")
             # Отправка видео пользователю
             with open(compressed_filename, 'rb') as video:
                 bot.send_video(message.chat.id, video, caption=f"Загрузка завершена: {title}")
